@@ -1,0 +1,291 @@
+cls 
+@ECHO OFF
+
+cd\
+echo cd WINDOWS
+echo cd system32
+echo cd cmd.exe
+
+set cho=empty_string
+if %cho%==0 goto CONFIRM
+goto CONFIRM 
+
+
+:CONFIRM
+CLS
+echo.
+color a
+echo  ****************************************************************
+echo  * FOR LAPTOP WIFI HOTSPOT NETWORK  "PLEASE ENTER BELOW CHOICE" *
+echo  ****************************************************************
+echo  *    Press (0) to [CREATE LAPTOP WIFI HOTSPOT NETWORK]         *
+echo  *                                                              *
+echo  *    Press (1) to change [NAME] and [PASSWORD]                 *
+echo  *                                                              *
+echo  *    Press (2) to [START LAPTOP WIFI HOTSPOT NETWORK]          *
+echo  *                                                              *
+echo  *    Press (3) to [STOP LAPTOP WIFI HOTSPOT NETWORK]           *
+echo  *                                                              *
+echo  *    Press (4) to [SHOW LAPTOP WIFI DETAILS]                   *
+echo  ****************************************************************
+echo.
+echo  ****************************************************************
+echo  *   FOR LAPTOP WIFI CONNECTION  "PLEASE ENTER BELOW CHOICE"    *
+echo  ****************************************************************
+echo  *    Press (5) to [*****SHOW WIFI CONNECTION PROFILE LIST***]  *
+echo  *                                                              *
+echo  *    Press (6) to [*******DELETE WIFI PROFILES******]          *
+echo  *                                                              *
+echo  *    Press (7) to [***DELETE ALL WIFI CONNECTION PROFILES***]  *
+echo  *                                                              *
+echo  *    Press (8) to [********SHOW ALL WIFI NETWORK******]        *
+echo  *                                                              *
+echo  *    Press (9) to [*********Reset all wifi cache********** ]   *
+echo  *                                                              *
+echo  *    Press (10) to [***********Repair wifi*******************] *
+echo  *                                                              *
+echo  *    Press (11) to [***EXIT****]                               *
+echo  *                                                              *
+echo  ****************************************************************
+echo.
+echo.
+set/p "cho=>" 
+if %cho%==0 goto edit 
+if %cho%==1 goto edit 
+if %cho%==2 goto start 
+if %cho%==3 goto stop 
+if %cho%==4 goto detail
+if %cho%==5 goto profile
+if %cho%==6 goto DEL_profile
+if %cho%==7 goto forget
+if %cho%==8 goto WIFI_LIST
+if %cho%==9 goto Flus
+if %cho%==10 goto win_soc
+if %cho%==11 goto End
+cls
+color c
+echo.
+echo.
+echo Invalid choice!
+echo msgbox "Please select given choice" > %tmp%\tmp.vbs
+cscript /nologo %tmp%\tmp.vbs
+del %tmp%\tmp.vbs
+goto CONFIRM 
+cls
+
+
+:PC_RESTART
+cls
+color c                           
+ECHO   YOU WHANT TO "RE-START-YOUR-PC PRESS"  (Y/N)" 
+set/p "cho=>" 
+if %cho%==Y goto PC_RESTART1
+if %cho%==y goto PC_RESTART1
+if %cho%==n goto AGAIN 
+if %cho%==N goto AGAIN
+CLS
+color c
+goto msg2
+
+
+
+:win_soc
+cls
+color c                           
+ECHO   YOU WHANT TO "Reset Network Adapter (Winsock Reset)"  (Y/N)" 
+set/p "cho=>" 
+if %cho%==Y goto win_soc1
+if %cho%==y goto win_soc1
+if %cho%==n goto AGAIN 
+if %cho%==N goto AGAIN
+CLS
+color c
+goto msg2
+goto win_soc1 
+
+:win_soc1
+cls
+color c
+netsh wlan delete profile name=* i=*
+ipconfig /release
+ipconfig /renew
+ipconfig /flushdns
+netsh int ip reset c:\resetlog.txt
+netsh winsock reset
+PAUSE
+goto PC_RESTART
+
+:PC_RESTART1
+cls
+shutdown -r -f -t 5
+color c
+echo.
+echo.
+echo YOUR PC GOING TO RE-START PLEASE WAIT  .............
+echo msgbox "YOUR PC GOING TO RE-START PLEASE WAIT  ............." > %tmp%\tmp.vbs
+cscript /nologo %tmp%\tmp.vbs
+del %tmp%\tmp.vbs
+PAUSE
+
+
+:Flus
+cls
+color c                           
+ECHO   YOU WHANT TO "Flush and reset a client resolver cache"  (Y/N)" 
+set/p "cho=>" 
+if %cho%==Y goto dns
+if %cho%==y goto dns
+if %cho%==n goto AGAIN 
+if %cho%==N goto AGAIN
+CLS
+color c
+goto msg2
+
+:dns
+cls
+ipconfig /flushdns
+PAUSE
+goto AGAIN
+
+:detail
+cls
+color e
+netsh wlan show hostednetwork
+netsh wlan show hostednetwork setting=security
+PAUSE
+goto AGAIN
+
+:WIFI_LIST
+color e
+color 67
+netsh wlan show network mode=bssid
+PAUSE
+goto AGAIN
+
+:profile
+cls
+color d
+netsh wlan show profiles
+PAUSE
+goto AGAIN
+
+:DEL_profile
+cls
+color c
+netsh wlan show profiles
+SET /P profile_name=PLEASE ENTER PROFILE NAME FROM ABOVE LIST TO DELETE:
+netsh wlan delete profile name="%profile_name%"
+netsh wlan show profiles
+PAUSE
+goto AGAIN
+
+:forget
+cls
+color c                           
+ECHO    "WARNING!" ,YOU WHANT TO DELETE ALL WIFI CONNECTION (Y/N)" 
+set/p "cho=>" 
+if %cho%==Y goto CONF
+if %cho%==y goto CONF
+if %cho%==n goto AGAIN 
+if %cho%==N goto AGAIN
+goto msg2
+goto CONF
+
+:CONF
+color c
+netsh wlan delete profile name=* i=*
+netsh wlan show profiles
+
+echo msgbox "SUCCESSFULLY DELETED" > %tmp%\tmp.vbs
+cscript /nologo %tmp%\tmp.vbs
+del %tmp%\tmp.vbs
+
+goto AGAIN
+
+:edit 
+cls
+color a
+SET /P wifi=PLEASE ENTER NEW WIFI NAME:
+SET /P pass=PLEASE ENTER NEW PASSWORD : 
+echo.
+netsh wlan set hostednetwork ssid=%wifi% keyUsage=persistent key=%pass% mode=allow
+echo.
+netsh wlan show hostednetwork
+echo.
+netsh wlan show hostednetwork setting=security
+echo.
+echo  [NEW WIFI NAME] : %wifi% 
+echo  [NEW PASSWORD ] : %pass% 
+
+echo msgbox "NEW WIFI NAME: %wifi% NEW  PASSWORD  : %pass% " > %tmp%\tmp.vbs
+cscript /nologo %tmp%\tmp.vbs
+del %tmp%\tmp.vbs
+
+PAUSE
+goto AGAIN
+
+
+
+:stop
+netsh wlan stop hostednetwork
+netsh wlan show hostednetwork
+color c
+ECHO ""WIFI STOPPED!""
+echo msgbox """WIFI STOPPED!""" > %tmp%\tmp.vbs
+cscript /nologo %tmp%\tmp.vbs
+del %tmp%\tmp.vbs
+goto AGAIN
+
+:start
+netsh wlan start hostednetwork 
+netsh wlan show hostednetwork
+netsh wlan show hostednetwork setting=security
+PAUSE
+goto AGAIN
+
+:AGAIN
+cls
+color c
+ECHO   ***************************************************
+ECHO   *                                                 *                                 
+ECHO   * "YOU WHANT START THESE STEPS AGAIN ENTER (Y/N)" *
+ECHO   *                                                 *
+ECHO   ***************************************************
+echo msgbox "Please press y for again, n for EXIT" > %tmp%\tmp.vbs
+cscript /nologo %tmp%\tmp.vbs
+del %tmp%\tmp.vbs
+echo  :
+set/p "cho=>" 
+if %cho%==Y goto CONFIRM 
+if %cho%==y goto CONFIRM 
+if %cho%==n goto End 
+if %cho%==N goto End
+goto msg2 
+goto AGAIN
+
+
+:End
+cls
+color c
+ECHO   ***************************************************
+ECHO   *                                                 *                                 
+ECHO   *THIS CODE IS WRITTEN BY "  SHASHI GAUTAM  "      *
+ECHO   *https://github.com/shashigautam06                *
+ECHO   */NetworkToolBash-version-2                       * 
+ECHO   ***************************************************
+ECHO               ***********************
+ECHO               *                     *                                 
+ECHO               *     THANKYOU!       *
+ECHO               *                     *
+ECHO               ***********************
+echo msgbox "THANKYOU FOR USING" > %tmp%\tmp.vbs
+cscript /nologo %tmp%\tmp.vbs
+del %tmp%\tmp.vbs
+
+
+
+:msg2
+echo Invalid choice!
+echo msgbox "Please select given choice" > %tmp%\tmp.vbs
+cscript /nologo %tmp%\tmp.vbs
+del %tmp%\tmp.vbs
